@@ -166,8 +166,9 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           railway login --token $RAILWAY_TOKEN
-          railway link --project reasonable-reverence
-          railway up --service flask-todo-cicd --ci
+          railway link --project reasonable-reverence --environment production
+          railway up --service flask-todo-cicd --ci --yes
+
 
       - name: Wait for deployment
         run: sleep 60
