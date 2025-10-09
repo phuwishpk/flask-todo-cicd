@@ -5,21 +5,22 @@ from app.routes import api
 from app.config import config
 from sqlalchemy import inspect   # ✅ เพิ่มบรรทัดนี้
 
+
 def create_app(config_name=None):
     """Application factory pattern"""
     if config_name is None:
         config_name = os.getenv('FLASK_ENV', 'development')
-    
+
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
-    
+
     # Initialize extensions
     db.init_app(app)
-    
+
     # Register blueprints
     app.register_blueprint(api, url_prefix='/api')
-    
+
     # Root endpoint
     @app.route('/')
     def index():
@@ -31,7 +32,7 @@ def create_app(config_name=None):
                 'todos': '/api/todos'
             }
         })
-    
+
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
