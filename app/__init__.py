@@ -3,15 +3,17 @@ from flask import Flask, jsonify
 from app.models import db
 from app.routes import api
 from app.config import config
-from sqlalchemy import inspect   # ✅ เพิ่มบรรทัดนี้
+from sqlalchemy import inspect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+
+# ✅ สร้าง limiter แบบ factory-compatible (ยังไม่ผูกกับ app)
 limiter = Limiter(
-    app=app,
     key_func=get_remote_address,
     default_limits=["200 per day", "50 per hour"]
 )
+
 def create_app(config_name=None):
     """Application factory pattern"""
     if config_name is None:
@@ -23,6 +25,7 @@ def create_app(config_name=None):
 
     # Initialize extensions
     db.init_app(app)
+    limiter.init_app(app)  # ✅ ผูก limiter กับ app ตรงนี้
 
     # Register blueprints
     app.register_blueprint(api, url_prefix='/api')
@@ -71,6 +74,5 @@ def create_app(config_name=None):
             'success': False,
             'error': 'Internal server error'
         }), 500
-    
 
     return app
