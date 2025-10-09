@@ -26,7 +26,8 @@ def health_check():
 def get_todos():
     """Get all todo items"""
     try:
-        todos = Todo.query.order_by(Todo.created_at.desc()).all()
+        todos = Todo.query.order_by(Todo.created_at.desc(), Todo.id.desc()).all()
+
         return jsonify({
             'success': True,
             'data': [todo.to_dict() for todo in todos],

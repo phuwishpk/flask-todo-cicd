@@ -3,6 +3,7 @@ from flask import Flask, jsonify
 from app.models import db
 from app.routes import api
 from app.config import config
+from sqlalchemy import inspect   # ✅ เพิ่มบรรทัดนี้
 
 def create_app(config_name=None):
     """Application factory pattern"""
@@ -38,16 +39,30 @@ def create_app(config_name=None):
             'success': False,
             'error': 'Resource not found'
         }), 404
-    
+
     @app.errorhandler(500)
     def internal_error(error):
         return jsonify({
             'success': False,
             'error': 'Internal server error'
         }), 500
-    
-    # Create tables
+
+    # ✅ Create tables safely within context
     with app.app_context():
-        db.create_all()
-    
+        inspector = inspect(db.engine)
+        existing_tables = inspector.get_table_names()
+        if 'todos' not in existing_tables:
+            db.create_all()
+
+    # ✅ Global exception handler
+    @app.errorhandler(Exception)
+    def handle_exception(error):
+        """Handle all unhandled exceptions gracefully"""
+        with app.app_context():
+            db.session.rollback()
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error'
+        }), 500
+
     return app
