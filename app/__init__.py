@@ -4,7 +4,7 @@ from flask_cors import CORS
 from app.models import db
 from app.routes import api
 from app.config import config
-from app.logging_config import setup_logging  # <-- 1. IMPORT THIS
+from app.logging_config import setup_logging
 
 
 def create_app(config_name=None):
@@ -34,8 +34,8 @@ def create_app(config_name=None):
 
     db.init_app(app)
     app.register_blueprint(api, url_prefix='/api')
-    
-    setup_logging(app)  # <-- 2. CALL THIS FUNCTION
+
+    setup_logging(app)
 
     @app.route('/')
     def index():
